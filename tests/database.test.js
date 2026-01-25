@@ -1,6 +1,5 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
-const { DB, Role } = require('../src/database/database');
 const { StatusCodeError } = require('../src/endpointHelper');
 
 jest.mock('mysql2/promise');
@@ -8,8 +7,10 @@ jest.mock('bcrypt');
 
 describe('database.js',()=> {
   let conn;
-  beforeEach(() => {
-    jest.clearAllMocks();
+  let DB;
+  let Role;
+
+  beforeAll(() => {
     conn = {
       execute: jest.fn(),
       query: jest.fn(),
@@ -18,7 +19,15 @@ describe('database.js',()=> {
       commit: jest.fn(),
       rollback: jest.fn(),
     };
-    mysql.createConnection.mockResolvedValue(conn);
+    const dbModule = require('../src/database/database');
+    DB = dbModule.DB;
+    Role = dbModule.Role;
+    jest.spyOn(DB, '_getConnection').mockResolvedValue(conn);
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    conn.execute.mockResolvedValue([[]]);
     conn.query.mockResolvedValue([[]]);
   });
 
@@ -124,7 +133,7 @@ describe('database.js',()=> {
   });
 
   test('createFranchise throw', async()=>{
-    conn.execute.mockResolvedValueOnce([]);
+    conn.execute.mockResolvedValueOnce([[]]);
     await expect(
       DB.createFranchise({ name:'F',admins: [{ email:'x@test.com' }] })
     ).rejects.toBeInstanceOf(StatusCodeError);
@@ -144,7 +153,7 @@ describe('database.js',()=> {
   });
 
   test('getUserFranchises return empty', async()=>{
-    conn.execute.mockResolvedValueOnce([]);
+    conn.execute.mockResolvedValueOnce([[]]);
     const result = await DB.getUserFranchises(1);
     expect(result).toEqual([]);
   });

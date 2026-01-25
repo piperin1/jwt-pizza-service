@@ -1,5 +1,3 @@
-const { DB } = require('../src/database/database');
-
 jest.mock('../src/database/database',()=> ({
   DB: {addUser: jest.fn(),},Role: {Admin: 'admin',},
 }));
@@ -8,12 +6,16 @@ describe('init.js',()=> {
   let ogArgv;
   let exitMock;
   let logMock;
+  let DB;
 
   beforeEach(()=> {
     jest.resetModules();
     ogArgv = process.argv;
     exitMock = jest.spyOn(process, 'exit').mockImplementation(() => {});
     logMock = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const database = require('../src/database/database');
+    DB = database.DB;
+    DB.addUser.mockResolvedValue({ id: 1, name: 'admin' });
   });
 
   afterEach(()=>{
