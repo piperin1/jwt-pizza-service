@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "lint": "eslint src/**",
-    "test": "jest --coverage --coverageReporters='json-summary' 'text'"
+    "test": "jest --coverage --coverageReporters=json-summary --coverageReporters=text --collectCoverageFrom='src/**/*.js'"
   },
   "license": "MIT",
   "dependencies": {
