@@ -3,10 +3,10 @@
   "description": "Backend service for making JWT pizzas",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "start": "cd src && node index.js",
-     "lint": "eslint ."
-  },
+ "scripts": {
+  "start": "node src/index.js",
+  "lint": "eslint src/**"
+},
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
