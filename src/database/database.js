@@ -8,7 +8,39 @@ class DB {
   constructor() {
     this.initialized = this.initializeDatabase();
   }
+ 
+  async getUsers() {
+    const connection = await this.getConnection();
+    try {
+    
+      const users = await this.query(connection, `SELECT id, name, email FROM user`);
+      for (const user of users) {
+        const rolesResult = await this.query(connection, `SELECT role, objectId FROM userRole WHERE userId=?`, [user.id]);
+        user.roles = rolesResult.map(r => ({ role: r.role, objectId: r.objectId || undefined }));
+      }
 
+      return users; 
+    } finally {
+      connection.end();
+    }
+} 
+
+async deleteUser(userId) {
+  const connection = await this.getConnection();
+  try {
+    await connection.beginTransaction();
+    try {
+      await this.query(connection, `DELETE FROM userRole WHERE userId=?`, [userId]);
+      await this.query(connection, `DELETE FROM user WHERE id=?`, [userId]);
+      await connection.commit();
+    } catch (err) {
+      await connection.rollback();
+      throw new Error(`Unable to delete user: ${err.message}`);
+    }
+  } finally {
+    connection.end();
+  }
+}
   async getMenu() {
     const connection = await this.getConnection();
     try {
