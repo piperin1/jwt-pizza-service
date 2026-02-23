@@ -101,6 +101,30 @@ describe('Delete User', () => {
 
 });
 
+test('list users handles DB error', async () => {
+  const adminToken = generateToken([{ role: 'admin' }]);
+
+  DB.getUsers.mockRejectedValueOnce(new Error('DB failure'));
+
+  const res = await request(app)
+    .get('/api/user')
+    .set('Authorization', 'Bearer ' + adminToken);
+
+  expect(res.status).toBe(500);
+});
+
+test('delete user handles DB error', async () => {
+  const adminToken = generateToken([{ role: 'admin' }]);
+
+  DB.deleteUser.mockRejectedValueOnce(new Error('DB exploded'));
+
+  const res = await request(app)
+    .delete('/api/user/1')
+    .set('Authorization', 'Bearer ' + adminToken);
+
+  expect(res.status).toBe(500);
+});
+
 // Helper
 function generateToken(roles) {
   return jwt.sign(
