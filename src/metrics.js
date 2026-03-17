@@ -182,7 +182,7 @@ function sendMetricsPeriodically(period) {
       resetMetrics();
       //console.log('---------------------------------------------------------------')
     } catch (error) {
-      //console.log('Error sending metrics', error);
+      console.log('Error sending metrics', error);
     }
   }, period);
 }
