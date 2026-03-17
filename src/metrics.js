@@ -59,6 +59,8 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       'AGGREGATION_TEMPORALITY_CUMULATIVE';
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
+  
+  console.log(`Sending metric: ${metricName} = ${metricValue}`);
 
   fetch(`${config.endpointUrl}`, {
     method: 'POST',
