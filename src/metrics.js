@@ -114,36 +114,6 @@ function pizzaPurchase(success, latency, price) {
 }
 
 
-function collectMetrics() {
-  const cpu = getCpuUsagePercentage();
-  const memory = getMemoryUsagePercentage();
-
-  const avgLatency = latencyCount === 0 ? 0 : totalLatency / latencyCount;
-
-  return {
-    httpMetrics: {
-      totalRequests,
-      methodCounts,
-    },
-    authMetrics: authAttempts,
-    userMetrics: {
-      activeUsers: activeUsers.size,
-    },
-    systemMetrics: {
-      cpu,
-      memory,
-    },
-    purchaseMetrics: {
-      pizzasSold,
-      pizzaFailures,
-      revenue,
-    },
-    latencyMetrics: {
-      avgLatency,
-    },
-  };
-}
-
 function resetMetrics() {
   totalRequests = 0;
   methodCounts = { GET: 0, POST: 0, PUT: 0, DELETE: 0 };
