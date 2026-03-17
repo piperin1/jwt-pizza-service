@@ -85,7 +85,7 @@ authRouter.put(
       res.json({ user: user, token: auth });
     } catch (err) {
       metrics.trackAuth(false);
-      return res.status(401).json({ message: 'invalid email or password' });
+      return res.status(401).json({ message: err, ': invalid email or password' });
     }
   })
 );
