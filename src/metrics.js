@@ -59,6 +59,8 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       'AGGREGATION_TEMPORALITY_CUMULATIVE';
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
+  
+  //console.log(`Sending metric: ${metricName} = ${metricValue}`);
 
   fetch(`${config.metrics.endpointUrl}`, {
     method: 'POST',
@@ -178,8 +180,9 @@ function sendMetricsPeriodically(period) {
       sendMetricToGrafana('request_latency', avgLatency, 'gauge', 'ms');
 
       resetMetrics();
+      //console.log('---------------------------------------------------------------')
     } catch (error) {
-      console.log('Error sending metrics', error);
+      //console.log('Error sending metrics', error);
     }
   }, period);
 }

@@ -6,6 +6,7 @@ const userRouter = require('./routes/userRouter.js');
 const version = require('./version.json');
 const config = require('./config.js');
 
+
 const app = express();
 app.use(express.json());
 app.use(setAuthUser);
@@ -16,6 +17,10 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
+
+const metrics = require('./metrics.js');
+app.use(metrics.requestTracker);
+
 
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
