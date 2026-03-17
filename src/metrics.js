@@ -26,7 +26,7 @@ let totalLatency = 0;
 let latencyCount = 0;
 
 
-const config = require('./config');
+const config = require('./config.js');
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
   const metric = {
@@ -59,10 +59,8 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       'AGGREGATION_TEMPORALITY_CUMULATIVE';
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
-  
-  console.log(`Sending metric: ${metricName} = ${metricValue}`);
 
-  fetch(`${config.endpointUrl}`, {
+  fetch(`${config.metrics.endpointUrl}`, {
     method: 'POST',
     body: JSON.stringify(metric),
     headers: {
