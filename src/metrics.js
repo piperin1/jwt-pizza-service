@@ -26,6 +26,52 @@ let totalLatency = 0;
 let latencyCount = 0;
 
 
+const config = require('./config');
+
+function sendMetricToGrafana(metricName, metricValue, type, unit) {
+  const metric = {
+    resourceMetrics: [
+      {
+        scopeMetrics: [
+          {
+            metrics: [
+              {
+                name: metricName,
+                unit: unit,
+                [type]: {
+                  dataPoints: [
+                    {
+                      asInt: Math.floor(metricValue),
+                      timeUnixNano: Date.now() * 1000000,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  if (type === 'sum') {
+    metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].aggregationTemporality =
+      'AGGREGATION_TEMPORALITY_CUMULATIVE';
+    metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
+  }
+
+  fetch(`${config.endpointUrl}`, {
+    method: 'POST',
+    body: JSON.stringify(metric),
+    headers: {
+      Authorization: `Bearer ${config.accountId}:${config.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+  }).catch((error) => {
+    console.error('Error pushing metrics:', error);
+  });
+}
+
 function requestTracker(req, res, next) {
   totalRequests++;
 
@@ -131,19 +177,37 @@ function getMemoryUsagePercentage() {
 function sendMetricsPeriodically(period) {
   setInterval(() => {
     try {
-      const data = collectMetrics();
+      const cpu = getCpuUsagePercentage();
+      const memory = getMemoryUsagePercentage();
+      const avgLatency = latencyCount === 0 ? 0 : totalLatency / latencyCount;
 
-      const metrics = new OtelMetricBuilder();
-      metrics.add(data.httpMetrics);
-      metrics.add(data.systemMetrics);
-      metrics.add(data.userMetrics);
-      metrics.add(data.purchaseMetrics);
-      metrics.add(data.authMetrics);
-      metrics.add(data.latencyMetrics);
+      // ---- HTTP ----
+      sendMetricToGrafana('http_requests_total', totalRequests, 'sum', '1');
+      sendMetricToGrafana('http_get', methodCounts.GET, 'sum', '1');
+      sendMetricToGrafana('http_post', methodCounts.POST, 'sum', '1');
+      sendMetricToGrafana('http_put', methodCounts.PUT, 'sum', '1');
+      sendMetricToGrafana('http_delete', methodCounts.DELETE, 'sum', '1');
 
-      metrics.sendToGrafana();
+      // ---- USERS ----
+      sendMetricToGrafana('active_users', activeUsers.size, 'gauge', '1');
 
-      resetMetrics(); // IMPORTANT
+      // ---- AUTH ----
+      sendMetricToGrafana('auth_success', authAttempts.success, 'sum', '1');
+      sendMetricToGrafana('auth_failure', authAttempts.failure, 'sum', '1');
+
+      // ---- SYSTEM ----
+      sendMetricToGrafana('cpu_usage', cpu, 'gauge', '%');
+      sendMetricToGrafana('memory_usage', memory, 'gauge', '%');
+
+      // ---- PIZZAS ----
+      sendMetricToGrafana('pizzas_sold', pizzasSold, 'sum', '1');
+      sendMetricToGrafana('pizza_failures', pizzaFailures, 'sum', '1');
+      sendMetricToGrafana('revenue', revenue, 'sum', 'usd');
+
+      // ---- LATENCY ----
+      sendMetricToGrafana('request_latency', avgLatency, 'gauge', 'ms');
+
+      resetMetrics();
     } catch (error) {
       console.log('Error sending metrics', error);
     }
