@@ -61,8 +61,9 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
   }
   
   //console.log(`Sending metric: ${metricName} = ${metricValue}`);
-
-  fetch(`${config.metrics.endpointUrl}`, {
+  console.log('Endpoint URL:', config.endpointUrl);
+  console.log('Metric endpt URL', config.metrics.endpointUrl);
+  fetch(`${config.endpointUrl}`, {
     method: 'POST',
     body: JSON.stringify(metric),
     headers: {
