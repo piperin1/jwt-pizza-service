@@ -158,6 +158,8 @@ jobs:
             apiKey: '${{ secrets.METRICS_API_KEY }}',
             accountId: '${{ secrets.METRICS_ACCOUNT_ID }}',
           },            
-        };" > src/config.js    
+        };" > src/config.js   
+    - name: Debug config
+      run: cat src/config.js   
 
 
