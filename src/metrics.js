@@ -65,14 +65,16 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
   //console.log('Endpoint URL:', config.endpointUrl);
   //console.log('Metric endpt URL:', config.metrics.endpointUrl);
 
-  fetch(`${config.metrics.endpointUrl}`, {
-    method: 'POST',
-    body: JSON.stringify(metric),
-    headers: {
-      Authorization: `Bearer ${config.accountId}:${config.apiKey}`,
-      'Content-Type': 'application/json',
-    },
-  }).catch((error) => {
+  const authHeader = 'Basic ' + Buffer.from(`${config.accountId}:${config.metrics.apiKey}`).toString('base64');
+
+fetch(config.metrics.endpointUrl, {
+  method: 'POST',
+  body: JSON.stringify(metric),
+  headers: {
+    Authorization: authHeader,
+    'Content-Type': 'application/json',
+  },
+}).catch((error) => {
     console.error('Error pushing metrics:', error);
   });
 }
