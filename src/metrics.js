@@ -22,6 +22,8 @@ const activeUsers = new Set();
 let pizzasSold = 0;
 let pizzaFailures = 0;
 let revenue = 0;
+let totalLatency = 0;
+let latencyCount = 0;
 let totalPLatency = 0;
 let latencyPCount = 0;
 
