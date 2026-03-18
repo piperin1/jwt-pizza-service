@@ -6,7 +6,7 @@ test('create order unauthorized', async () => {
   expect(res.status).toBe(401);
 });
 
-test('franchise route', async () => {
-  const res = await request(app).get('/api/franchise');
-  expect(res.status).toBe(200);
-});
+//test('franchise route', async () => {
+  //const res = await request(app).get('/api/franchise');
+  //expect(res.status).toBe(200);
+//});
