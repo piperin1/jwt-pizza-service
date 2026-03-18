@@ -46,7 +46,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                       attributes: [
                         {
                           key: 'source',
-                          value: { stringValue: "jwt-pizza-service" }
+                          value: { stringValue: "jwt-pizza-service-test" }
                     }]
                     },
                   ],
@@ -65,6 +65,8 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
   
+  //console.log(`Sending metric to Grafana: ${metricName} = ${metricValue}`);
+
   fetch(`${config.metrics.endpointUrl}`, {
     method: 'POST',
     body: JSON.stringify(metric),
@@ -110,6 +112,7 @@ function pizzaPurchase(success, latency, price) {
   if (success) {
     pizzasSold++;
     revenue += price;
+    //console.log("TRACKING REVENUE:", revenue);
   } else {
     pizzaFailures++;
   }
