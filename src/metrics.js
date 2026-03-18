@@ -26,7 +26,8 @@ let totalLatency = 0;
 let latencyCount = 0;
 
 
-const config = require('./config.js');
+const config = require('./src/config.js');
+console.log('config:', config);
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
   const metric = {
@@ -61,9 +62,9 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
   }
   
   //console.log(`Sending metric: ${metricName} = ${metricValue}`);
-  console.log('Endpoint URL:', config.endpointUrl);
-  console.log('Metric endpt URL', config.metrics.endpointUrl);
-  
+  //console.log('Endpoint URL:', config.endpointUrl);
+  console.log('Metric endpt URL:', config.metrics.endpointUrl);
+
   fetch(`${config.metrics.endpointUrl}`, {
     method: 'POST',
     body: JSON.stringify(metric),
