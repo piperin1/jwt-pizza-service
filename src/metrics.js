@@ -22,8 +22,8 @@ const activeUsers = new Set();
 let pizzasSold = 0;
 let pizzaFailures = 0;
 let revenue = 0;
-let totalLatency = 0;
-let latencyCount = 0;
+let totalPLatency = 0;
+let latencyPCount = 0;
 
 
 const config = require('./config.js');
@@ -117,7 +117,7 @@ function pizzaPurchase(success, latency, price) {
     pizzaFailures++;
   }
 
-  totalLatency += latency;
+  totalPLatency += latency;
   latencyCount++;
 }
 
@@ -134,6 +134,8 @@ function resetMetrics() {
 
   totalLatency = 0;
   latencyCount = 0;
+  totalPLatency = 0;
+  latencyPCount = 0;
 
   activeUsers.clear();
 }
@@ -158,6 +160,7 @@ function sendMetricsPeriodically(period) {
       const cpu = getCpuUsagePercentage();
       const memory = getMemoryUsagePercentage();
       const avgLatency = latencyCount === 0 ? 0 : totalLatency / latencyCount;
+      const avgPLatency = latencyPCount === 0 ? 0 : totalPLatency / latencyPCount;
 
       // ---- HTTP ----
       sendMetricToGrafana('http_requests_total', totalRequests, 'sum', '1');
@@ -184,6 +187,7 @@ function sendMetricsPeriodically(period) {
 
       // ---- LATENCY ----
       sendMetricToGrafana('request_latency', avgLatency, 'gauge', 'ms');
+      sendMetricToGrafana('pizza_latency', avgPLatency, 'gauge', 'ms');
 
       resetMetrics();
       //console.log('---------------------------------------------------------------')
