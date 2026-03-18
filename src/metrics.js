@@ -26,8 +26,8 @@ let totalLatency = 0;
 let latencyCount = 0;
 
 
-const config = require('./src/config.js');
-console.log('config:', config);
+const config = require('./config.js');
+console.log('DEBUG:: CONFIG:', config);
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
   const metric = {
