@@ -136,7 +136,8 @@ jobs:
     - name: Write config file
       run: |
         mkdir -p src
-        echo "module.exports = {
+        cat <<EOF > src/config.js
+        module.exports = {
           jwtSecret: '${{ secrets.JWT_SECRET }}',
           db: {
             connection: {
@@ -154,11 +155,12 @@ jobs:
           },
           metrics: {
             source: 'jwt-pizza-service',
-            endpointUrl: "'"${{ secrets.METRICS_ENDPOINT_URL }}"'",
-            apiKey: "'"${{ secrets.METRICS_API_KEY }}"'",
-            accountId: "'"${{ secrets.METRICS_ACCOUNT_ID }}"'",
-          },            
-        };" > src/config.js 
+            endpointUrl: '${{ secrets.METRICS_ENDPOINT_URL }}',
+            apiKey: '${{ secrets.METRICS_API_KEY }}',
+            accountId: '${{ secrets.METRICS_ACCOUNT_ID }}',
+          },
+        };
+        EOF
     - name: Debug config
       run: cat src/config.js   
 
