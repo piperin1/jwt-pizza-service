@@ -72,8 +72,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       Authorization: `Bearer ${config.metrics.accountId}:${config.metrics.apiKey}`,
       'Content-Type': 'application/json',
     },
-  }).then(console.log)
-  .catch((error) => {
+  }).catch((error) => {
     console.error('Error pushing metrics:', error);
   });
 }
