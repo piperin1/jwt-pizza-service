@@ -43,7 +43,6 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                 [type]: {
                   dataPoints: [
                     {
-                      asInt: Math.floor(metricValue),
                       timeUnixNano: Date.now() * 1000000,
                       attributes: [
                         {
@@ -110,7 +109,7 @@ function trackAuth(success) {
   }
 }
 
-function pizzaPurchase(success, latency, price) {
+function pizzaPurchase(success, platency, price) {
   if (success) {
     pizzasSold++;
     revenue += price;
@@ -119,8 +118,8 @@ function pizzaPurchase(success, latency, price) {
     pizzaFailures++;
   }
 
-  totalPLatency += latency;
-  latencyCount++;
+  totalPLatency += platency;
+  latencyPCount++;
 }
 
 
