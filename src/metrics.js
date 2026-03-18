@@ -27,7 +27,6 @@ let latencyCount = 0;
 
 
 const config = require('./config.js');
-//console.log('DEBUG:: CONFIG:', config);
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
   const metric = {
@@ -44,6 +43,11 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                     {
                       asInt: Math.floor(metricValue),
                       timeUnixNano: Date.now() * 1000000,
+                      attributes: [
+                        {
+                          key: 'source',
+                          value: { stringValue: "jwt-pizza-service" }
+                    }]
                     },
                   ],
                 },
@@ -61,20 +65,15 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
   
-  //console.log(`Sending metric: ${metricName} = ${metricValue}`);
-  //console.log('Endpoint URL:', config.endpointUrl);
-  //console.log('Metric endpt URL:', config.metrics.endpointUrl);
-
-  const authHeader = 'Basic ' + Buffer.from(`${config.accountId}:${config.metrics.apiKey}`).toString('base64');
-
-fetch(config.metrics.endpointUrl, {
-  method: 'POST',
-  body: JSON.stringify(metric),
-  headers: {
-    Authorization: authHeader,
-    'Content-Type': 'application/json',
-  },
-}).catch((error) => {
+  fetch(`${config.metrics.endpointUrl}`, {
+    method: 'POST',
+    body: JSON.stringify(metric),
+    headers: {
+      Authorization: `Bearer ${config.metrics.accountId}:${config.metrics.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+  }).then(console.log)
+  .catch((error) => {
     console.error('Error pushing metrics:', error);
   });
 }
