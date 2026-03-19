@@ -63,7 +63,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
 
   if (type === 'sum') {
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].aggregationTemporality =
-      'AGGREGATION_TEMPORALITY_DELTA';
+      'AGGREGATION_TEMPORALITY_CUMULATIVE';
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
   
@@ -131,7 +131,6 @@ function resetMetrics() {
   authAttempts = { success: 0, failure: 0 };
 
   pizzasSold = 0;
-  pizzaFailures = 0;
   revenue = 0;
 
   totalLatency = 0;
