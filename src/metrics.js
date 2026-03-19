@@ -63,7 +63,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
 
   if (type === 'sum') {
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].aggregationTemporality =
-      'AGGREGATION_TEMPORALITY_CUMULATIVE';
+      'AGGREGATION_TEMPORALITY_DELTA';
     metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
   }
   
