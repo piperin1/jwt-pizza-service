@@ -131,6 +131,7 @@ function resetMetrics() {
   authAttempts = { success: 0, failure: 0 };
 
   pizzasSold = 0;
+  pizzaFailures = 0;
   revenue = 0;
 
   totalLatency = 0;
