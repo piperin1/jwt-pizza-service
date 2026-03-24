@@ -5,6 +5,7 @@ const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 const orderRouter = express.Router();
 const metrics = require('../metrics.js');
+const {logFactoryRequest} = require('../logger.js');
 
 orderRouter.docs = [
   {
@@ -83,6 +84,10 @@ orderRouter.post(
       const orderReq = req.body;
 
       const order = await DB.addDinerOrder(req.user, orderReq);
+      const factoryRequestBody = {
+        diner: { id: req.user.id, name: req.user.name, email: req.user.email },
+        order,
+      };
 
       const r = await fetch(`${config.factory.url}/api/order`, {
         method: 'POST',
@@ -90,13 +95,12 @@ orderRouter.post(
           'Content-Type': 'application/json',
           authorization: `Bearer ${config.factory.apiKey}`,
         },
-        body: JSON.stringify({
-          diner: { id: req.user.id, name: req.user.name, email: req.user.email },
-          order,
-        }),
+        body: JSON.stringify({ factoryRequestBody })
       });
 
       const j = await r.json();
+      
+      logFactoryRequest(factoryRequestBody, {status: r.status, response:j,});
       const latency = Date.now() - start; 
 
       if (r.ok) {
