@@ -5,6 +5,8 @@ const franchiseRouter = require('./routes/franchiseRouter.js');
 const userRouter = require('./routes/userRouter.js');
 const version = require('./version.json');
 const config = require('./config.js');
+const httpLogger = require('./logger.js').httpLogger;
+const {logError} = require('./logger.js');
 
 
 const app = express();
@@ -19,6 +21,7 @@ app.use((req, res, next) => {
 });
 
 const metrics = require('./metrics.js');
+app.use(httpLogger);
 app.use(metrics.requestTracker);
 
 
@@ -52,8 +55,11 @@ app.use('*', (req, res) => {
 
 // Default error handler for all exceptions and errors.
 app.use((err, req, res, next) => {
-  res.status(err.statusCode ?? 500).json({ message: err.message, stack: err.stack });
-  next();
+  logError(err);
+  res.status(err.statusCode ?? 500).json({
+    message: err.message,
+    stack: err.stack,
+  });
 });
 
 module.exports = app;

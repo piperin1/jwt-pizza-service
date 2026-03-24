@@ -29,19 +29,17 @@ function sendLogToLoki(labels, logLine) {
 
 function sanitize(data) {
   if (!data) return data;
+  const sanitized = { ...data };
 
-  let obj = typeof data === 'string' ? { value: data } : data;
-
-  let str = JSON.stringify(obj)
-    .replace(/"password":"[^"]*"/gi, '"password":"***"')
-    .replace(/"token":"[^"]*"/gi, '"token":"***"')
-    .replace(/"authorization":"[^"]*"/gi, '"authorization":"***"');
-
-  try {
-    return JSON.parse(str);
-  } catch {
-    return str;
+  if (Array.isArray(sanitized.params)) {
+    sanitized.params = sanitized.params.map(() => '***');
   }
+
+  if (sanitized.password) sanitized.password = '***';
+  if (sanitized.token) sanitized.token = '***';
+  if (sanitized.authorization) sanitized.authorization = '***';
+
+  return sanitized;
 }
 
 function httpLogger(req, res, next) {
@@ -57,6 +55,17 @@ function httpLogger(req, res, next) {
   };
 
   res.on('finish', () => {
+    let sanitizedResponse;
+    if (typeof responseBody === 'string') {
+      try {
+        sanitizedResponse = sanitize(JSON.parse(responseBody));
+      } catch {
+        sanitizedResponse = sanitize({ message: responseBody });
+      }
+    } else {
+      sanitizedResponse = sanitize(responseBody);
+    }
+
     const logLine = JSON.stringify({
       type: 'http',
       method: req.method,
@@ -64,7 +73,7 @@ function httpLogger(req, res, next) {
       status: res.statusCode,
       hasAuth,
       requestBody: sanitize(req.body),
-      responseBody: sanitize(responseBody),
+      responseBody: sanitizedResponse,
       latency: Date.now() - start,
     });
 
@@ -72,7 +81,7 @@ function httpLogger(req, res, next) {
       {
         service: 'pizza-service',
         category: 'http',
-        source: 'jwt-pizza-service-dev',
+        source: 'jwt-pizza-service-test',
       },
       logLine
     );
@@ -86,7 +95,7 @@ function logDbQuery(query) {
     {
       service: 'pizza-service',
       category: 'database',
-      source: 'jwt-pizza-service-dev',
+      source: 'jwt-pizza-service-test',
     },
     JSON.stringify({
       type: 'db',
@@ -100,7 +109,7 @@ function logFactoryRequest(requestBody, responseBody) {
     {
       service: 'pizza-service',
       category: 'factory',
-      source: 'jwt-pizza-service-dev',
+      source: 'jwt-pizza-service-test',
     },
     JSON.stringify({
       type: 'factory',
@@ -115,7 +124,7 @@ function logError(error) {
     {
       service: 'pizza-service',
       category: 'error',
-      source: 'jwt-pizza-service-dev',
+      source: 'jwt-pizza-service-test',
     },
     JSON.stringify({
       type: 'error',
