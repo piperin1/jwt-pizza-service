@@ -95,7 +95,7 @@ orderRouter.post(
           'Content-Type': 'application/json',
           authorization: `Bearer ${config.factory.apiKey}`,
         },
-        body: JSON.stringify({ factoryRequestBody })
+        body: JSON.stringify(factoryRequestBody)
       });
 
       const j = await r.json();
