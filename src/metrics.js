@@ -16,7 +16,7 @@ let authAttempts = {
 };
 
 //USER METRICS
-const activeUsers = new Set();
+const activeUsers = new Map();
 
 //PIZZA METRICS
 let pizzasSold = 0;
@@ -88,7 +88,7 @@ function requestTracker(req, res, next) {
     methodCounts[req.method]++;
   }
   if (req.user && req.user.id) {
-    activeUsers.add(req.user.id);
+    activeUsers.set(req.user.id, Date.now());
   }
 
   const start = Date.now();
@@ -123,23 +123,23 @@ function pizzaPurchase(success, platency, price) {
   latencyPCount++;
 }
 
+function cleanupInactiveUsers(timeoutMs = 5 * 60 * 1000) {
+  const now = Date.now();
+  for (const [userId, lastSeen] of activeUsers.entries()) {
+    if (now - lastSeen > timeoutMs) {
+      activeUsers.delete(userId);
+    }
+  }
+}
 
 function resetMetrics() {
-  totalRequests = 0;
-  methodCounts = { GET: 0, POST: 0, PUT: 0, DELETE: 0 };
-
-  authAttempts = { success: 0, failure: 0 };
-
-  pizzasSold = 0;
-  pizzaFailures = 0;
-  revenue = 0;
 
   totalLatency = 0;
   latencyCount = 0;
   totalPLatency = 0;
   latencyPCount = 0;
 
-  activeUsers.clear();
+  cleanupInactiveUsers();
 }
 
 
